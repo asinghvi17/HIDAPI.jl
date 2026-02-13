@@ -1,0 +1,16 @@
+name = "HIDAPI"
+uuid = "32bda012-3723-419b-9d2b-681d390a8526"
+version = "0.1.0"
+
+[deps]
+CEnum = "fa961155-64e5-5f13-b03f-caf6b980ea82"
+
+[compat]
+julia = "1.6"
+CEnum = "0.4, 0.5"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]

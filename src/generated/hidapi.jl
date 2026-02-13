@@ -28,7 +28,6 @@ HID underlying bus types.
     HID_API_BUS_BLUETOOTH = 2
     HID_API_BUS_I2C = 3
     HID_API_BUS_SPI = 4
-    HID_API_BUS_VIRTUAL = 5
 end
 
 """
@@ -64,7 +63,7 @@ This function initializes the HIDAPI library. Calling it is not	strictly necessa
 This function returns 0 on success and -1 on error.	Call [`hid_error`](@ref)(NULL) to get the failure reason.
 """
 function hid_init()
-    @ccall libhidapi.hid_init()::Cint
+    @ccall hidapi.hid_init()::Cint
 end
 
 """
@@ -80,7 +79,7 @@ This function frees all of the static data associated with	HIDAPI. It should be 
 This function returns 0 on success and -1 on error.
 """
 function hid_exit()
-    @ccall libhidapi.hid_exit()::Cint
+    @ccall hidapi.hid_exit()::Cint
 end
 
 """
@@ -103,7 +102,7 @@ This function returns a linked list of all the HID devices	attached to the syste
 This function returns a pointer to a linked list of type	struct #[`hid_device_info`](@ref), containing information about the HID devices	attached to the system,	or NULL in the case of failure or if no HID devices present in the system.	Call [`hid_error`](@ref)(NULL) to get the failure reason.
 """
 function hid_enumerate(vendor_id, product_id)
-    @ccall libhidapi.hid_enumerate(
+    @ccall hidapi.hid_enumerate(
         vendor_id::Cushort,
         product_id::Cushort,
     )::Ptr{hid_device_info}
@@ -122,7 +121,7 @@ This function frees a linked list created by [`hid_enumerate`](@ref)().
 * `devs`: Pointer to a list of struct\\_device returned from	[`hid_enumerate`](@ref)().
 """
 function hid_free_enumeration(devs)
-    @ccall libhidapi.hid_free_enumeration(devs::Ptr{hid_device_info})::Cvoid
+    @ccall hidapi.hid_free_enumeration(devs::Ptr{hid_device_info})::Cvoid
 end
 
 """
@@ -146,7 +145,7 @@ If `serial_number` is NULL, the first device with the	specified VID and PID is o
 This function returns a pointer to a #[`hid_device`](@ref) object on	success or NULL on failure.	Call [`hid_error`](@ref)(NULL) to get the failure reason.
 """
 function hid_open(vendor_id, product_id, serial_number)
-    @ccall libhidapi.hid_open(
+    @ccall hidapi.hid_open(
         vendor_id::Cushort,
         product_id::Cushort,
         serial_number::Ptr{Cwchar_t},
@@ -172,7 +171,7 @@ The path name be determined by calling [`hid_enumerate`](@ref)(), or a	platform-
 This function returns a pointer to a #[`hid_device`](@ref) object on	success or NULL on failure.	Call [`hid_error`](@ref)(NULL) to get the failure reason.
 """
 function hid_open_path(path)
-    @ccall libhidapi.hid_open_path(path::Cstring)::Ptr{hid_device}
+    @ccall hidapi.hid_open_path(path::Cstring)::Ptr{hid_device}
 end
 
 """
@@ -194,11 +193,7 @@ The first byte of `data`[] must contain the Report ID. For	devices which only su
 This function returns the actual number of bytes written and	-1 on error.	Call [`hid_error`](@ref)(dev) to get the failure reason.
 """
 function hid_write(dev, data, length)
-    @ccall libhidapi.hid_write(
-        dev::Ptr{hid_device},
-        data::Ptr{Cuchar},
-        length::Csize_t,
-    )::Cint
+    @ccall hidapi.hid_write(dev::Ptr{hid_device}, data::Ptr{Cuchar}, length::Csize_t)::Cint
 end
 
 """
@@ -223,7 +218,7 @@ Input reports are returned	to the host through the INTERRUPT IN endpoint. The fi
 This function returns the actual number of bytes read and	-1 on error.	Call [`hid_read_error`](@ref)(dev) to get the failure reason.	If no packet was available to be read within	the timeout period, this function returns 0.
 """
 function hid_read_timeout(dev, data, length, milliseconds)
-    @ccall libhidapi.hid_read_timeout(
+    @ccall hidapi.hid_read_timeout(
         dev::Ptr{hid_device},
         data::Ptr{Cuchar},
         length::Csize_t,
@@ -252,11 +247,7 @@ Input reports are returned	to the host through the INTERRUPT IN endpoint. The fi
 This function returns the actual number of bytes read and	-1 on error.	Call [`hid_read_error`](@ref)(dev) to get the failure reason.	If no packet was available to be read and	the handle is in non-blocking mode, this function returns 0.
 """
 function hid_read(dev, data, length)
-    @ccall libhidapi.hid_read(
-        dev::Ptr{hid_device},
-        data::Ptr{Cuchar},
-        length::Csize_t,
-    )::Cint
+    @ccall hidapi.hid_read(dev::Ptr{hid_device}, data::Ptr{Cuchar}, length::Csize_t)::Cint
 end
 
 """
@@ -280,7 +271,7 @@ Strings returned from [`hid_read_error`](@ref)() must not be freed by the user,	
 A string describing the [`hid_read`](@ref)/[`hid_read_timeout`](@ref) error (if any).
 """
 function hid_read_error(dev)
-    @ccall libhidapi.hid_read_error(dev::Ptr{hid_device})::Ptr{Cwchar_t}
+    @ccall hidapi.hid_read_error(dev::Ptr{hid_device})::Ptr{Cwchar_t}
 end
 
 """
@@ -301,7 +292,7 @@ Nonblocking can be turned on and off at any time.
 This function returns 0 on success and -1 on error.	Call [`hid_error`](@ref)(dev) to get the failure reason.
 """
 function hid_set_nonblocking(dev, nonblock)
-    @ccall libhidapi.hid_set_nonblocking(dev::Ptr{hid_device}, nonblock::Cint)::Cint
+    @ccall hidapi.hid_set_nonblocking(dev::Ptr{hid_device}, nonblock::Cint)::Cint
 end
 
 """
@@ -321,7 +312,7 @@ Feature reports are sent over the Control endpoint as a	Set\\_Report transfer. T
 This function returns the actual number of bytes written and	-1 on error.	Call [`hid_error`](@ref)(dev) to get the failure reason.
 """
 function hid_send_feature_report(dev, data, length)
-    @ccall libhidapi.hid_send_feature_report(
+    @ccall hidapi.hid_send_feature_report(
         dev::Ptr{hid_device},
         data::Ptr{Cuchar},
         length::Csize_t,
@@ -345,7 +336,7 @@ Set the first byte of `data`[] to the Report ID of the	report to be read. Make s
 This function returns the number of bytes read plus	one for the report ID (which is still in the first	byte), or -1 on error.	Call [`hid_error`](@ref)(dev) to get the failure reason.
 """
 function hid_get_feature_report(dev, data, length)
-    @ccall libhidapi.hid_get_feature_report(
+    @ccall hidapi.hid_get_feature_report(
         dev::Ptr{hid_device},
         data::Ptr{Cuchar},
         length::Csize_t,
@@ -375,7 +366,7 @@ This function returns the actual number of bytes written and	-1 on error.
 hid_write
 """
 function hid_send_output_report(dev, data, length)
-    @ccall libhidapi.hid_send_output_report(
+    @ccall hidapi.hid_send_output_report(
         dev::Ptr{hid_device},
         data::Ptr{Cuchar},
         length::Csize_t,
@@ -401,7 +392,7 @@ Set the first byte of `data`[] to the Report ID of the	report to be read. Make s
 This function returns the number of bytes read plus	one for the report ID (which is still in the first	byte), or -1 on error.	Call [`hid_error`](@ref)(dev) to get the failure reason.
 """
 function hid_get_input_report(dev, data, length)
-    @ccall libhidapi.hid_get_input_report(
+    @ccall hidapi.hid_get_input_report(
         dev::Ptr{hid_device},
         data::Ptr{Cuchar},
         length::Csize_t,
@@ -419,7 +410,7 @@ Close a HID device.
 * `dev`: A device handle returned from [`hid_open`](@ref)().
 """
 function hid_close(dev)
-    @ccall libhidapi.hid_close(dev::Ptr{hid_device})::Cvoid
+    @ccall hidapi.hid_close(dev::Ptr{hid_device})::Cvoid
 end
 
 """
@@ -437,7 +428,7 @@ Get The Manufacturer String from a HID device.
 This function returns 0 on success and -1 on error.	Call [`hid_error`](@ref)(dev) to get the failure reason.
 """
 function hid_get_manufacturer_string(dev, string, maxlen)
-    @ccall libhidapi.hid_get_manufacturer_string(
+    @ccall hidapi.hid_get_manufacturer_string(
         dev::Ptr{hid_device},
         string::Ptr{Cwchar_t},
         maxlen::Csize_t,
@@ -459,7 +450,7 @@ Get The Product String from a HID device.
 This function returns 0 on success and -1 on error.	Call [`hid_error`](@ref)(dev) to get the failure reason.
 """
 function hid_get_product_string(dev, string, maxlen)
-    @ccall libhidapi.hid_get_product_string(
+    @ccall hidapi.hid_get_product_string(
         dev::Ptr{hid_device},
         string::Ptr{Cwchar_t},
         maxlen::Csize_t,
@@ -481,7 +472,7 @@ Get The Serial Number String from a HID device.
 This function returns 0 on success and -1 on error.	Call [`hid_error`](@ref)(dev) to get the failure reason.
 """
 function hid_get_serial_number_string(dev, string, maxlen)
-    @ccall libhidapi.hid_get_serial_number_string(
+    @ccall hidapi.hid_get_serial_number_string(
         dev::Ptr{hid_device},
         string::Ptr{Cwchar_t},
         maxlen::Csize_t,
@@ -507,7 +498,7 @@ Since version 0.13.0, HID_API_VERSION >= [`HID_API_MAKE_VERSION`](@ref)(0, 13, 0
 This function returns a pointer to the struct #[`hid_device_info`](@ref)	for this [`hid_device`](@ref), or NULL in the case of failure.	Call [`hid_error`](@ref)(dev) to get the failure reason.	This struct is valid until the device is closed with [`hid_close`](@ref)().
 """
 function hid_get_device_info(dev)
-    @ccall libhidapi.hid_get_device_info(dev::Ptr{hid_device})::Ptr{hid_device_info}
+    @ccall hidapi.hid_get_device_info(dev::Ptr{hid_device})::Ptr{hid_device_info}
 end
 
 """
@@ -526,7 +517,7 @@ Get a string from a HID device, based on its string index.
 This function returns 0 on success and -1 on error.	Call [`hid_error`](@ref)(dev) to get the failure reason.
 """
 function hid_get_indexed_string(dev, string_index, string, maxlen)
-    @ccall libhidapi.hid_get_indexed_string(
+    @ccall hidapi.hid_get_indexed_string(
         dev::Ptr{hid_device},
         string_index::Cint,
         string::Ptr{Cwchar_t},
@@ -553,7 +544,7 @@ User has to provide a preallocated buffer where descriptor will be copied to.	Th
 This function returns non-negative number of bytes actually copied, or -1 on error.
 """
 function hid_get_report_descriptor(dev, buf, buf_size)
-    @ccall libhidapi.hid_get_report_descriptor(
+    @ccall hidapi.hid_get_report_descriptor(
         dev::Ptr{hid_device},
         buf::Ptr{Cuchar},
         buf_size::Csize_t,
@@ -581,7 +572,7 @@ Strings returned from [`hid_error`](@ref)() must not be freed by the user,	i.e. 
 A string describing the last error (if any).
 """
 function hid_error(dev)
-    @ccall libhidapi.hid_error(dev::Ptr{hid_device})::Ptr{Cwchar_t}
+    @ccall hidapi.hid_error(dev::Ptr{hid_device})::Ptr{Cwchar_t}
 end
 
 """
@@ -597,7 +588,7 @@ This function is thread-safe.
 Pointer to statically allocated struct, that contains version.
 """
 function hid_version()
-    @ccall libhidapi.hid_version()::Ptr{hid_api_version}
+    @ccall hidapi.hid_version()::Ptr{hid_api_version}
 end
 
 """
@@ -613,13 +604,27 @@ This function is thread-safe.
 Pointer to statically allocated string, that contains version string.
 """
 function hid_version_str()
-    unsafe_string(@ccall(libhidapi.hid_version_str()::Cstring))
+    unsafe_string(@ccall(hidapi.hid_version_str()::Cstring))
 end
 
-const HID_API_VERSION_MAJOR = 0
+# const HID_API_EXPORT_CALL = HID_API_EXPORT(HID_API_CALL)
 
-const HID_API_VERSION_MINOR = 16
+# const HID_API_VERSION_MAJOR = 0
 
-const HID_API_VERSION_PATCH = 0
+# const HID_API_VERSION_MINOR = 15
+
+# const HID_API_VERSION_PATCH = 0
+
+# const HID_API_VERSION = HID_API_MAKE_VERSION(
+#     HID_API_VERSION_MAJOR,
+#     HID_API_VERSION_MINOR,
+#     HID_API_VERSION_PATCH,
+# )
+
+# const HID_API_VERSION_STR = HID_API_TO_VERSION_STR(
+#     HID_API_VERSION_MAJOR,
+#     HID_API_VERSION_MINOR,
+#     HID_API_VERSION_PATCH,
+# )
 
 const HID_API_MAX_REPORT_DESCRIPTOR_SIZE = 4096

@@ -2,11 +2,12 @@ using Clang
 using Clang.Generators
 using MacroTools: @capture, prettify
 using JuliaFormatter: format
+import hidapi_jll
 
 cd(@__DIR__)
 
 # --- Locate the HIDAPI header from the local build ---
-hidapi_include_dir = normpath(joinpath(@__DIR__, "..", "..", "hidapi", "hidapi"))
+hidapi_include_dir = joinpath(hidapi_jll.artifact_dir, "include", "hidapi") |> normpath
 headers = [joinpath(hidapi_include_dir, "hidapi.h")]
 
 # Verify header exists

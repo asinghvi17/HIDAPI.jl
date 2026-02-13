@@ -4,7 +4,7 @@ using Test
 @testset "HIDAPI.jl" begin
 
     @testset "Library loading" begin
-        @test isfile(HIDAPI.libhidapi)
+        @test isfile(HIDAPI.hidapi)
     end
 
     @testset "Error types" begin

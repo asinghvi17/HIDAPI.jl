@@ -1,22 +1,11 @@
 module HIDAPI
 
 using CEnum
+using Libdl
 
-# Resolve path to the locally-built HIDAPI shared library at precompile time.
-const libhidapi = let
-    candidates = [
-        joinpath(@__DIR__, "..", "..", "hidapi", "build", "src", "mac", "libhidapi.dylib"),
-        joinpath(@__DIR__, "..", "..", "hidapi", "build", "src", "mac", "libhidapi.0.dylib"),
-        joinpath(@__DIR__, "..", "..", "hidapi", "build", "libhidapi.dylib"),
-    ]
-    idx = findfirst(isfile, candidates)
-    if idx === nothing
-        error("libhidapi.dylib not found. Build HIDAPI first.")
-    end
-    normpath(candidates[idx])
-end
+using hidapi_jll: hidapi
 
-include("generated/libhidapi.jl")  # Auto-generated raw @ccall bindings
+include("generated/hidapi.jl")  # Auto-generated raw @ccall bindings
 include("error.jl")                # HIDAPIError, unsafe_wstring, check_result
 include("devices.jl")              # High-level Julian API
 
